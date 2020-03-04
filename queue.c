@@ -129,15 +129,6 @@ bool q_insert_tail(queue_t *q, char *s)
     }
     strncpy(newh->value, s, strlen(s) + 1);
     q->size++;
-    /*
-    if (q->tail == NULL) {
-        q->head = newh;
-        q->tail = newh;
-    } else {
-        q->tail->next = newh;
-        q->tail = newh;
-    }
-    */
     if (q->size == 1) {
         /*
          * The first operation is "it XX", we make q->head point to newh
@@ -171,17 +162,18 @@ bool q_remove_head(queue_t *q, char *sp, size_t bufsize)
         return false;
     }
     if (q->size == 0) {
-        free(q);
         return false;
     }
     list_ele_t *remove = q->head;
     q->head = q->head->next;
 
-    if (remove->value) {
-        strncpy(sp, remove->value, bufsize);
+    if (sp && remove->value) {
+        strncpy(sp, remove->value, bufsize - 1);
+        sp[bufsize - 1] = '\0';
     }
-
-    free(remove->value);
+    if (remove->value) {
+        free(remove->value);
+    }
     free(remove);
     q->size--;
 
@@ -196,6 +188,9 @@ int q_size(queue_t *q)
 {
     /* You need to write the code for this function */
     /* Remember: It should operate in O(1) time */
+    if (q == NULL) {
+        return 0;
+    }
     return q->size;
 }
 
